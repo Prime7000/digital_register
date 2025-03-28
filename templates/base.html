@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}  {% endblock %}</title>
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+</head>
+<style>
+    * {
+    box-sizing: border-box;
+    }
+
+    html, body {
+    height: 100%;
+    margin: 0;
+    }
+
+    .container {
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+        height: 100vh;
+    }
+    .container > div:nth-child(1) {
+        flex-grow: 1;
+        flex-shrink: 1;
+        flex-basis: 15%;
+        border: 1px solid black;
+    }
+    .container > div:nth-child(2) {
+        flex-grow: 1;
+        flex-shrink: 1;
+        flex-basis: 85%;
+        border: 1px solid black;
+    }
+    #sidebar {
+                background-color: #f4f4f4;
+                padding: 20px;
+                display: flex;
+                flex-direction: column;
+            }
+    #sidebar p {
+        margin: 0;
+        padding: 0;
+        line-height: 2.5rem;
+
+    }
+    #sidebar p:hover {
+                font-size: 20px;
+                transition: 0.7s;
+            }
+    #sidebar p:last-child {
+        margin-top: auto; /* Push "Logout" to the bottom */
+    }
+</style>
+<body>
+    <div class="container">
+        <div id = "sidebar">
+            <p>Home</p>
+            <p>Dashboard</p>
+            <p>About</p>
+            <p>Statistics</p>
+            <p>SignUp</p>
+            <p>Settings</p>
+            <p>Logout</p>
+        </div>
+        <div>
+            {% block content %}
+
+            {% endblock %}
+        </div>
+    </div>
+    
+</body>
+</html>
