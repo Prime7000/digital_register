@@ -4,4 +4,97 @@
 
 {% block content %}
 
+<style>
+    main{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: auto;
+        padding: 3px;
+        margin: 3px;
+    }
+    #signup-prop{
+        /* border: 1px solid black; */
+        width:50%;
+        height:auto;
+        border-radius: 20px;
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        background-color: #f4f4f4;
+    }
+
+    #signup-prop input{
+        height: 2rem;
+        border-radius: 7px;
+        border: none;
+    }
+
+    #signup-prop input:hover{
+        height: 2rem;
+        border-radius: 7px;
+        border: 3px solid black;
+    }
+
+    #signup-prop label{
+        padding-top: 0.7rem;
+        font-weight: 900;
+    }
+
+
+</style>
+<main>
+    <div id="signup-prop">
+        <h1 style="text-align: center;">Signup</h1>
+        <label for="username">Username</label>
+        <input type="text" name="username" id="" placeholder="Insert Username e.g Prime">
+
+        <label for="first_name">First Name</label>
+        <input type="text" name="first_name" id="" placeholder="Insert first name e.g Ofejiro">
+
+        <label for="last_name">Last Name</label>
+        <input type="text" name="last_name" id="" placeholder="Insert last name e.g Agbaduta">
+
+        <label for="email">Email</label>
+        <input type="email" name="Email" id="" placeholder="Insert Email e.g primeofejiro@gmail.com">
+
+        <label for="username">Role</label>
+        <select name="" id="" style="height: 2rem; border-radius: 7px; border: none;">
+            <option value="leader">Leader</option>
+            <option value="admin">Admin</option>
+            <option value="inspector">inspector</option>
+        </select>
+
+        <label for="password">Password</label>
+        <input type="password" name="password" id="" placeholder="Insert a strong password">
+
+        <label for="password">Confirm Password</label>
+        <input type="password" name="confirm_password" id="" placeholder="Please confirm password">
+
+        <label for=""></label>
+        <div style="text-align: center;">
+            <style>
+                button{
+                    width: 100px;
+                    text-align: center;
+                    padding: 5px;
+                    border-radius:20px;
+                }
+
+                button:hover{
+                    width: 100px;
+                    text-align: center;
+                    padding: 5px;
+                    border-radius:20px;
+                    background-color: white;
+                    padding: 8px;
+                    transition: all 0.7s;
+                }
+            </style>
+            <button type="submit">Submit</button>
+        </div>
+    </div>
+    
+</main>
 {% endblock %}

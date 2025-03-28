@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}  {% endblock %}</title>
-    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+    <!-- <script src="https://unpkg.com/htmx.org@2.0.4"></script> -->
 </head>
 <style>
     * {
@@ -26,13 +26,13 @@
         flex-grow: 1;
         flex-shrink: 1;
         flex-basis: 15%;
-        border: 1px solid black;
+        /* border: 1px solid black; */
     }
     .container > div:nth-child(2) {
         flex-grow: 1;
         flex-shrink: 1;
         flex-basis: 85%;
-        border: 1px solid black;
+        /* border: 1px solid black; */
     }
     #sidebar {
                 background-color: #f4f4f4;
@@ -53,15 +53,27 @@
     #sidebar p:last-child {
         margin-top: auto; /* Push "Logout" to the bottom */
     }
+
+    a{
+        text-decoration: none;
+        color: black;
+    }
 </style>
 <body>
     <div class="container">
         <div id = "sidebar">
-            <p>Home</p>
+            <p>
+                <a href="/">Home</a>
+            </p>
             <p>Dashboard</p>
             <p>About</p>
             <p>Statistics</p>
-            <p>SignUp</p>
+            <p>
+                <a href="/signup">Signup</a>
+            </p>
+            <p>
+                <a href="/login">Login</a>
+            </p>
             <p>Settings</p>
             <p>Logout</p>
         </div>
