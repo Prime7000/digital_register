@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
+from livereload import Server
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'my_name_is_prime'
@@ -46,11 +47,20 @@ def signup():
 def login():
     return render_template('login.html')
 # ________________________________________________________________________________________________________
+# if __name__ == '__main__':
+#     app.run(host='0.0.0.0', port=5000,debug=True)
+
+# --- livereload integration ---
 if __name__ == '__main__':
-    app.run(debug=True)
+    server = Server(app.wsgi_app)
+    server.watch('*.py')
+    # Watch all template files
+    server.watch('templates/*.*')  # All files in templates and subdirectories
+    server.watch('static/**/*.*')     # All static files    # Watch static files
+    server.watch('**/*.*', delay=1)
+    server.watch('*.html')
 
-
-
-
+    
+    server.serve(port=5000, host='0.0.0.0', debug=True)
 
 
