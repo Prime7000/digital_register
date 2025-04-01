@@ -1,5 +1,5 @@
-const width = window.screen.availWidth;
-const height = window.screen.availHeight;
+var width = window.screen.availWidth;
+var height = window.screen.availHeight;
 console.log("Available Screen Width:", width);
 console.log("Available Screen Height:", height);
 console.log('prime')
