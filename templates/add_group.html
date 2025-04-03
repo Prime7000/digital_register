@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Workers{% endblock %}
+
+{% block content %}
+
+<form method="POST">
+{{ form.hidden_tag() }}
+<p>{{form.group_name.label}} {{form.group_name()}}</p>
+<button type="submit">Submit</button>
+</form>
+
+<hr>
+
+{% for g in group %}
+<p>
+    <li>{{g.group_name}}</li>
+</p>
+{% endfor %}
+
+{% endblock %}
