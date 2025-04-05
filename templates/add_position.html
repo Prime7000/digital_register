@@ -119,12 +119,12 @@
         <form method="POST" novalidate> {# Added novalidate to disable browser validation if using WTForms validation #}
             {{ form.hidden_tag() }} {# CSRF token #}
 
-            {{ form.group_name.label }} {# Render label #}
-            {{ form.group_name(placeholder="Enter new group name", size=20 ,style="width: 100%;") }} {# Render input field with placeholder #}
+            {{ form.position_name.label }} {# Render label #}
+            {{ form.position_name(placeholder="Enter new position name", size=20 ,style="width: 100%;") }} {# Render input field with placeholder #}
             {# Display errors for the field if any #}
-            {% if form.group_name.errors %}
+            {% if form.position_name.errors %}
                 <ul class="errors" style="color: red; list-style: none; padding-left: 0; font-size: 0.9em;">
-                    {% for error in form.group_name.errors %}<li>{{ error }}</li>{% endfor %}
+                    {% for error in form.position_name.errors %}<li>{{ error }}</li>{% endfor %}
                 </ul>
             {% endif %}
 
@@ -141,15 +141,15 @@
 <hr style="width: 60%; margin: 2rem auto;">
 
 <div class="group-list">
-    <h2>Existing Groups</h2>
-    {% if group %}
+    <h2>Existing Positions</h2>
+    {% if position %}
     <ul>
-        {% for g in group %}
-        <li>{{ g.group_name }}</li>
+        {% for p in position %}
+        <li>{{ p.position_name }}</li>
         {% endfor %}
     </ul>
     {% else %}
-    <p style="text-align: center; color: #888;">No groups added yet.</p>
+        <p style="text-align: center; color: #888;">No positions added yet.</p>
     {% endif %}
 </div>
 
