@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}Event Register{% endblock %}
+
+{% block content %}
+
+<style>
+    main {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+    }
+
+    main div{
+        height: 200px;
+        width: 300px;
+        border: 1px solid black;
+    }
+</style>
+
+<main>
+    {% if events %}
+        {% for event in events %}
+        <div>
+            <p>{{event.event.event_name}}</p>
+            <p>{{event.event.event_day}}</p>
+            <p>{{event.worker.first_name}} {{event.worker.last_name}}</p>
+            <p>{{event.worker.group.group_name}}</p>
+            <p>{{event.worker.position.position_name}}</p>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p>No events registered.</p>
+    {% endif %}
+</main>
+
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+
+<style>
+    main input{
+        max-width: 70%;
+        min-width: 50%;
+        padding: 5px;
+        margin: 5px;
+    }
+
+</style>
+
+<main>
+    <form action="" method="POST">
+        <div style="text-align: center; width: 100%;">
+            <input type="text" name="query" placeholder="Search" id="">
+
+        </div>
+        <div style="text-align: center;">
+            <button type="submit">Search</button>
+        </div>
+
+        <a href="/events_register">event_register</a>
+    </form>
+
+    <hr>
+    {% if results %}
+        <p>{{results.first_name}} id-{{results.unique_id}}</p>
+    {% endif %}
+
+    {% if msg %}
+        <p style="color: red;">{{msg}}</p>
+    {% endif %}
+</main>
+
+
+{% endblock %}

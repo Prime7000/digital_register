@@ -2,13 +2,18 @@ from flask import Flask, render_template, request, redirect, url_for,flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from livereload import Server
+# from livereload import Server
 from flask_wtf import FlaskForm
 from wtforms import StringField, SelectField, FloatField, FileField, SubmitField, DateField,TimeField
 from wtforms.validators import DataRequired
 from flask_wtf.file import FileAllowed
 import os
 from werkzeug.utils import secure_filename
+import random
+
+import datetime
+from datetime import date
+from sqlalchemy import or_
 
 
 
@@ -29,6 +34,11 @@ db = SQLAlchemy(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
+
+from flask_migrate import Migrate
+
+migrate = Migrate(app, db)
+
 
 #user model:
 class User(UserMixin, db.Model):
@@ -62,6 +72,18 @@ class Events(db.Model):
 
     def __str__(self):
         return f'<Group {self.event_name}>'
+    
+class Event_register(db.Model):
+    id =  db.Column(db.Integer, primary_key=True)
+    event = db.relationship('Events', backref='event_register', lazy=True)
+    event_id = db.Column(db.Integer, db.ForeignKey('events.id'), nullable=False)
+    worker = db.relationship('Workers', backref='event_register', lazy=True)
+    worker_id = db.Column(db.Integer, db.ForeignKey('workers.id'), nullable=False)
+    early = db.Column(db.Boolean, default=False)
+    present = db.Column(db.Boolean, default=False)
+    month = db.Column(db.String(50), nullable=False)
+    year = db.Column(db.String(50), nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.datetime.now)
     
 # event form
 class EventForm(FlaskForm):
@@ -113,6 +135,7 @@ class Workers(db.Model):
     gender = db.Column(db.String(10), nullable=False)
     date_of_birth = db.Column(db.String(20), nullable=False)
     passport_image = db.Column(db.String(200), nullable=False)
+    unique_id = db.Column(db.String(50), unique=True, nullable=False)
 
     def __str__(self):
         return f'<Worker {self.first_name}>'
@@ -137,6 +160,9 @@ class WorkerForm(FlaskForm):
 
     def __str__(self):
         return f'{self.first_name} with {self.position} position'
+    
+
+
 
     
 
@@ -176,8 +202,14 @@ def add_workers():
 
     if form.validate_on_submit():
         filename = None
+        date_obj = datetime.date.today()
+        year = date_obj.year
 
-        print('image detected', f'filename {form.passport_image.data}')
+        random_number = random.randint(100000, 999999)
+        unique_id = f"vor/{year}/{random_number}"
+        
+
+        # print('image detected', f'filename {form.passport_image.data}')
 
         if form.passport_image.data:
             filename = secure_filename(form.passport_image.data.filename)
@@ -200,7 +232,8 @@ def add_workers():
             position_id = form.position.data,
             gender = form.gender.data,
             date_of_birth = str(form.date_of_birth.data),
-            passport_image = filename
+            passport_image = filename,
+            unique_id = unique_id
         )
         db.session.add(new_worker)
         db.session.commit()
@@ -278,28 +311,81 @@ def add_event():
     return render_template('add_event.html', form=form, events=events)
     
 
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    events = Events.query.all()
+    events_days = [event.event_day for event in events]
+    print(f'---------------------------{events_days}')
+
+
+    current_day = datetime.datetime.now().strftime("%A")
+    current_month = datetime.datetime.now().strftime("%B")
+    print(f'---------------------------{current_day}')
+    print(f'---------------------------{current_month}')
+
+    event_day_id = Events.query.filter(Events.event_day == current_day).first()
+
+
+
+    if request.method == 'POST':
+        if current_day in events_days:
+            query = request.form['query']
+            if query:
+                results = Workers.query.filter(or_(Workers.first_name.contains(query),Workers.unique_id.contains(query))).first()
+
+                mark = Event_register(
+                    event_id = event_day_id.id,
+                    worker_id = results.id,
+                    month = current_month,
+                    year = datetime.datetime.now().year,
+                    early = False,
+                    present = False
+                )
+                db.session.add(mark)
+                db.session.commit()
+
+                print(f'---------------------------{results}')
+            else:
+                results = []
+            return render_template('register.html', results=results)
+        else:
+            return render_template('register.html',msg='No event for today')
+        
+
+    return render_template('register.html')
+
+@app.route('/events_register')
+def events_register():
+    events = Event_register.query.all()
+    return render_template('events_register.html', events=events)
+    
+
 
 
 # ________________________________________________________________________________________________________
-# if __name__ == '__main__':
-#     app.run(host='0.0.0.0', port=5000,debug=True)
-
-# --- livereload integration ---
 if __name__ == '__main__':
     with app.app_context():
-        # db.session.remove()  # Close any existing sessions
+        db.session.remove()  # Close any existing sessions
         # db.drop_all()        # Drop all tables defined in your models
         db.create_all()
+    app.run(host='0.0.0.0', port=8000,debug=True )
 
-    server = Server(app.wsgi_app)
-    server.watch('*.py')
-    # Watch all template files
-    server.watch('templates/*.*')  # All files in templates and subdirectories
-    server.watch('static/**/*.*')     # All static files    # Watch static files
-    server.watch('**/*.*', delay=1)
-    server.watch('*.html')
+# --- livereload integration ---    
+# if __name__ == '__main__':
+#     with app.app_context():
+#         # db.session.remove()  # Close any existing sessions
+#         # db.drop_all()        # Drop all tables defined in your models
+#         db.create_all()
+
+#     server = Server(app.wsgi_app)
+#     server.watch('*.py')
+#     # Watch all template files
+#     server.watch('templates/*.*')  # All files in templates and subdirectories
+#     server.watch('static/**/*.*')     # All static files    # Watch static files
+#     server.watch('**/*.*', delay=1)
+#     server.watch('*.html')
 
     
-    server.serve(port=5000, host='0.0.0.0', debug=True)
-
+#     server.serve(port=5000, host='0.0.0.0', debug=True)
+ 
 
