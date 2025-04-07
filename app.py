@@ -12,6 +12,7 @@ from werkzeug.utils import secure_filename
 import random
 
 import datetime
+# from datetime import datetime
 from datetime import date
 from sqlalchemy import or_
 
@@ -202,7 +203,7 @@ def add_workers():
 
     if form.validate_on_submit():
         filename = None
-        date_obj = datetime.date.today()
+        date_obj = date.today()
         year = date_obj.year
 
         random_number = random.randint(100000, 999999)
@@ -310,6 +311,7 @@ def add_event():
     events = Events.query.all()
     return render_template('add_event.html', form=form, events=events)
     
+from datetime import datetime
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -318,16 +320,34 @@ def register():
     print(f'---------------------------{events_days}')
 
 
-    current_day = datetime.datetime.now().strftime("%A")
-    current_month = datetime.datetime.now().strftime("%B")
+    current_day = datetime.now().strftime("%A")
+    current_month = datetime.now().strftime("%B")
     print(f'---------------------------{current_day}')
     print(f'---------------------------{current_month}')
 
+    current_day = 'Sunday'
     event_day_id = Events.query.filter(Events.event_day == current_day).first()
 
 
 
     if request.method == 'POST':
+        now = datetime.now()
+        current_time = now.strftime("%H:%M:%S")
+        current_time_obj = datetime.strptime(current_time, "%H:%M:%S")
+        
+        e = Events.query.filter(Events.event_day == current_day).first()
+        deadline_time = e.event_late_time
+        print(f'---------------------------{deadline_time}')
+        deadline_time_obj = datetime.strptime(deadline_time, "%H:%M:%S")
+        
+
+        if current_time_obj < deadline_time_obj:
+            deadline_state = False
+            if_present = True
+        else:
+            deadline_state = True
+            if_present = False
+        
         if current_day in events_days:
             query = request.form['query']
             if query:
@@ -337,9 +357,9 @@ def register():
                     event_id = event_day_id.id,
                     worker_id = results.id,
                     month = current_month,
-                    year = datetime.datetime.now().year,
-                    early = False,
-                    present = False
+                    year = datetime.now().year,
+                    early = deadline_state,
+                    present = if_present
                 )
                 db.session.add(mark)
                 db.session.commit()
