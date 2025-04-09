@@ -383,11 +383,161 @@ def register_ind(ind):
         return jsonify(info) 
         
 
+# this section is created by ai
+# Add this import at the top if you don't have it
+from sqlalchemy import func # Needed for counting
+from datetime import datetime, timedelta, time
+from dateutil.relativedelta import relativedelta # More robust for month/year 
 
-@app.route('/events_register')
+# ... (keep other imports and code)
+
+@app.route('/events_register', methods=['GET'])
 def events_register():
-    events = Event_register.query.all()
-    return render_template('events_register.html', events=events)
+    # Get filter parameters from query string
+    selected_group_id = request.args.get('group_id', 'all')
+    selected_status = request.args.get('status', 'all')
+    selected_period = request.args.get('period', 'all_time') # New parameter, default to 'all_time'
+
+    # Base query
+    query = Event_register.query.join(Workers).join(Group) # Join necessary tables
+
+    # Apply Group Filter
+    if selected_group_id != 'all':
+        try:
+            group_id_int = int(selected_group_id)
+            query = query.filter(Workers.group_id == group_id_int)
+        except ValueError:
+            flash("Invalid Group ID selected.", "error")
+            selected_group_id = 'all'
+
+    # Apply Status Filter
+    if selected_status == 'early':
+        # Original logic: Early means present AND early flag is true
+        query = query.filter(Event_register.present == True, Event_register.early == True)
+    elif selected_status == 'late':
+         # Original logic: Late means present AND early flag is false
+        query = query.filter(Event_register.present == True, Event_register.early == False)
+    elif selected_status == 'absent':
+        # Original logic: Absent means present flag is false
+        query = query.filter(Event_register.present == False)
+    # 'all' status requires no additional filtering here
+
+    # --- Apply Time Period Filter ---
+    now = datetime.now()
+    today_start = datetime.combine(now.date(), time.min)
+    today_end = datetime.combine(now.date(), time.max)
+
+    start_date = None
+    end_date = None
+
+    if selected_period == 'today':
+        start_date = today_start
+        end_date = today_end
+    elif selected_period == 'yesterday':
+        yesterday = now.date() - timedelta(days=1)
+        start_date = datetime.combine(yesterday, time.min)
+        end_date = datetime.combine(yesterday, time.max)
+    elif selected_period == 'this_week':
+        # Monday is 0, Sunday is 6
+        start_of_week = now.date() - timedelta(days=now.weekday())
+        end_of_week = start_of_week + timedelta(days=6)
+        start_date = datetime.combine(start_of_week, time.min)
+        end_date = datetime.combine(end_of_week, time.max)
+    elif selected_period == 'last_week':
+        end_of_last_week = now.date() - timedelta(days=now.weekday() + 1)
+        start_of_last_week = end_of_last_week - timedelta(days=6)
+        start_date = datetime.combine(start_of_last_week, time.min)
+        end_date = datetime.combine(end_of_last_week, time.max)
+    elif selected_period == 'this_month':
+        start_of_month = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        # Go to next month, then subtract one day to get end of current month
+        next_month = start_of_month + relativedelta(months=1)
+        end_of_month = next_month - timedelta(seconds=1) # End of the last day
+        start_date = start_of_month
+        end_date = end_of_month
+    elif selected_period == 'last_month':
+        end_of_last_month = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0) - timedelta(seconds=1)
+        start_of_last_month = end_of_last_month.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        start_date = start_of_last_month
+        end_date = end_of_last_month
+    elif selected_period == 'this_year':
+        start_of_year = now.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
+        # Go to next year, subtract one second
+        next_year = start_of_year + relativedelta(years=1)
+        end_of_year = next_year - timedelta(seconds=1)
+        start_date = start_of_year
+        end_date = end_of_year
+    elif selected_period == 'last_year':
+        end_of_last_year = now.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0) - timedelta(seconds=1)
+        start_of_last_year = end_of_last_year.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
+        start_date = start_of_last_year
+        end_date = end_of_last_year
+    # Add more specific periods like 'year_2023' if needed
+    # elif selected_period == 'year_2023':
+    #     start_date = datetime(2023, 1, 1, 0, 0, 0)
+    #     end_date = datetime(2023, 12, 31, 23, 59, 59, 999999)
+
+    # Apply the date filter if start_date and end_date are set
+    if start_date and end_date:
+        query = query.filter(Event_register.timestamp >= start_date, Event_register.timestamp <= end_date)
+    # --- End Time Period Filter ---
+
+
+    # Fetch the filtered events
+    filtered_events = query.order_by(Event_register.timestamp.desc()).all()
+
+    # --- Calculate Statistics based on filtered results ---
+    # (Keep the existing statistics calculation logic - it works on filtered_events)
+    total_count = len(filtered_events)
+    early_count = 0
+    late_count = 0
+    absent_count = 0
+
+    if total_count > 0:
+        for event_reg in filtered_events:
+            if event_reg.present:
+                if event_reg.early:
+                    early_count += 1
+                else:
+                    late_count += 1
+            else:
+                absent_count += 1
+
+        early_percentage = round((early_count / total_count) * 100, 1) if total_count else 0
+        late_percentage = round((late_count / total_count) * 100, 1) if total_count else 0
+        absent_percentage = round((absent_count / total_count) * 100, 1) if total_count else 0
+        present_count = early_count + late_count
+        present_percentage = round((present_count / total_count) * 100, 1) if total_count else 0
+    else:
+        early_percentage = late_percentage = absent_percentage = present_percentage = 0
+        present_count = 0
+
+    stats = {
+        'total_count': total_count,
+        'early_count': early_count,
+        'late_count': late_count,
+        'absent_count': absent_count,
+        'present_count': present_count,
+        'early_percentage': early_percentage,
+        'late_percentage': late_percentage,
+        'absent_percentage': absent_percentage,
+        'present_percentage': present_percentage,
+    }
+
+    # Fetch all groups for the filter dropdown
+    groups = Group.query.order_by(Group.group_name).all()
+
+    return render_template(
+        'events_register.html',
+        events=filtered_events,
+        stats=stats,
+        groups=groups,
+        selected_group_id=selected_group_id,
+        selected_status=selected_status,
+        selected_period=selected_period  # Pass the selected period
+    )
+
+# ... (keep other routes and the rest of the app.py code)
     
 
 
