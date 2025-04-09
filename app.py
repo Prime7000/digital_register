@@ -311,7 +311,7 @@ def register():
     print(f'---------------------------{current_day}')
     print(f'---------------------------{current_month}')
 
-    current_day = 'Sunday'
+    # current_day = 'Sunday'
     event_day_id = Events.query.filter(Events.event_day == current_day).first()
 
 
@@ -382,6 +382,12 @@ def register_ind(ind):
 
         return jsonify(info) 
         
+@app.route('/profile/<int:id>')
+def user_profile(id):
+    worker = Workers.query.filter(Workers.id == id).first()
+
+    return render_template('user_profile.html', current_user=worker)
+
 
 # this section is created by ai
 # Add this import at the top if you don't have it
