@@ -163,20 +163,6 @@ class WorkerForm(FlaskForm):
         return f'{self.first_name} with {self.position} position'
     
 
-
-
-    
-
-
-
-
-
-
-    
-
-    
-
-
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))  # Adjust based on your ORM
