@@ -364,15 +364,39 @@ def register():
                 db.session.add(mark)
                 db.session.commit()
 
-                print(f'---------------------------{results}')
+                print(f'---------------------------sucessfully submitted')
             else:
-                results = []
-            return render_template('register.html', results=results)
+                pass
+
+            return render_template('pages/attendant_register.html')
         else:
-            return render_template('register.html',msg='No event for today')
+            return render_template('pages/attendant_register.html',msg='No event for today')
         
 
-    return render_template('register.html')
+    return render_template('pages/attendant_register.html')
+
+
+
+@app.route('/get_individual/<ind>', methods=['GET'])
+def register_ind(ind):
+    results = Workers.query.filter(or_(Workers.first_name.contains(ind),Workers.unique_id.contains(ind))).first()
+    if results:
+        info = {
+            'firstname':results.first_name,
+            'lastname':results.last_name,
+            'mat_num':results.unique_id,
+            'dept':results.group.group_name
+        }
+
+        return jsonify(info)
+    else:
+        info = {
+            'error':'Record not found'
+        }
+
+        return jsonify(info) 
+        
+
 
 @app.route('/events_register')
 def events_register():

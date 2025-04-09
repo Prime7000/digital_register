@@ -120,13 +120,8 @@
                 </form>
 
                 <!-- the result -->
-                 <div id="result" style="border: 1px solid black;height: 70px; border-radius: 20px; padding: 3px; margin: 6px;">
-                    <ul style="font-size: 12px;">
-                        <li>first-name last-name </li>
-                        <li>mat-num</li>
-                        <li>department</li>
-                    </ul>
-                    <span style="color: green; font-size: 12px;">please click details to submit</span>
+                 <div id="result2" style="border: 1px solid black;height: 70px; border-radius: 20px; padding: 3px; margin: 6px; display: none;">
+                    
                  </div>
              </div>
              <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -134,19 +129,41 @@
              <script>
                 $(document).ready(function(){
                     var input = document.getElementById('attendance')
+                    var result = document.getElementById('result2')
                     input.addEventListener('input',()=>{
                         console.log('it changed')
                         console.log(input.value)
 
                         $.ajax({
-                            type:'POST',
-                            url:'/attendance_register',
-                            contentType:'application/json',
-                            data:JSON.stringify({
-                                name:input.value
-                            }),
+                            type:'GET',
+                            url: `/get_individual/${input.value}`,
+
                             success:function(response){
-                                console.log('attendance submitted')
+                                if (response && response.firstname){
+                                    if (input.value != ""){
+                                        result.style.display = 'block'
+                                    }else{
+                                        result.style.display = 'none'
+                                    }
+                                    result.innerHTML = `
+                                        <ul style="font-size: 12px;">
+                                            <li>${response.firstname} ${response.lastname}</li>
+                                            <li>${response.mat_num}</li>
+                                            <li>${response.dept}</li>
+                                        </ul>
+                                    `;
+                                }else{
+                                    if (input.value != ""){
+                                        result.style.display = 'block'
+                                    }else{
+                                        result.style.display = 'none'
+                                    }
+                                    result.innerHTML = `
+                                        <ul style="font-size: 12px;">
+                                            <li>No such record</li>
+                                        </ul>
+                                    `;
+                                }
                             },
                             error: function(error){
                                 console.log('there is an error')
