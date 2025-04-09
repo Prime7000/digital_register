@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}  {% endblock %}</title>
+    <!-- <script src="https://unpkg.com/htmx.org@2.0.4"></script> -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+</head>
+<style>
+    * {
+    box-sizing: border-box;
+    }
+
+    html, body {
+    height: 100%;
+    margin: 0;
+    }
+
+    .container {
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+        height: 100vh;
+    }
+    .container > div:nth-child(1) {
+        flex-grow: 0;
+        flex-shrink: 0;
+        flex-basis: 15%;
+        /* border: 1px solid black; */
+    }
+
+    .container > div:nth-child(2) {
+        flex-grow: 0;
+        flex-shrink: 0;
+        flex-basis: 85%;
+        /* border: 1px solid black; */
+    }
+    #sidebar {
+                background-color: #f4f4f4;
+                padding: 20px;
+                display: flex;
+                flex-direction: column;
+            }
+    #sidebar p {
+        margin: 0;
+        padding: 0;
+        line-height: 2.5rem;
+
+    }
+    #sidebar p:hover {
+                font-size: 20px;
+                transition: 0.7s;
+            }
+    #sidebar p:last-child {
+        margin-top: auto; /* Push "Logout" to the bottom */
+    }
+
+    a{
+        text-decoration: none;
+        color: black;
+    }
+
+    
+    #menu {
+        display: flex;
+        justify-content: space-between;
+        padding-top: 3px;
+        justify-content: center;
+        align-items: center;      
+    }
+
+   
+
+</style>
+<body>
+    <div class="container">
+        <div id = "sidebar">
+            <p>
+                <a href="/">Home</a>
+            </p>
+            <p>Dashboard</p>
+            <p>About</p>
+            <p>Statistics</p>
+            <p>
+                <a href="/signup">Signup</a>
+            </p>
+            <p>
+                <a href="/login">Login</a>
+            </p>
+            <p>Settings</p>
+            <p>Logout</p>
+        </div>
+
+
+
+        <div>
+            <div id="menu">
+                <div>
+                    <svg id="menu-icon" xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/>
+                    </svg>
+                </div>
+                <div id="result">
+                    Welcome 500
+                </div>
+            </div>
+            <!-- {% block content %} -->
+             <br>
+             <div style="">
+                <form action="" method="POST">
+                    <div id="frame" style="text-align: center; width: 100%;">
+                        <label id="label" for="attendance" style="font-weight: 900; display: block; text-align: start; padding-left: 163px;">Input Name Or Mat Number</label>
+                        <input type="text" style="" name="query" id="attendance" placeholder="Insert first name or mat num">
+                    </div>
+                    <br>
+                    <div style="padding: 7px; text-align: center; border-radius: 20px; margin: 5px;">
+                        <button id="mobile_submit" style="padding: 5px; width: 100px; border-radius: 10px; border: none; color: white; background-color: black;" type="submit">Submit</button>
+                    </div>
+                </form>
+
+                <!-- the result -->
+                 <div id="result" style="border: 1px solid black;height: 70px; border-radius: 20px; padding: 3px; margin: 6px;">
+                    <ul style="font-size: 12px;">
+                        <li>first-name last-name </li>
+                        <li>mat-num</li>
+                        <li>department</li>
+                    </ul>
+                    <span style="color: green; font-size: 12px;">please click details to submit</span>
+                 </div>
+             </div>
+             <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+             <script>
+                $(document).ready(function(){
+                    var input = document.getElementById('attendance')
+                    input.addEventListener('input',()=>{
+                        console.log('it changed')
+                        console.log(input.value)
+
+                        $.ajax({
+                            type:'POST',
+                            url:'/attendance_register',
+                            contentType:'application/json',
+                            data:JSON.stringify({
+                                name:input.value
+                            }),
+                            success:function(response){
+                                console.log('attendance submitted')
+                            },
+                            error: function(error){
+                                console.log('there is an error')
+                            }
+                        })
+                    })
+                })
+
+             </script>
+
+             <script>
+                var width = window.screen.availWidth
+                var m_submit = document.getElementById('mobile_submit')
+
+                if (width < 450){
+                    document.getElementById('attendance').setAttribute('style', "padding:5px; width: 85%;");
+                    document.getElementById('frame').style.textAlign = 'start'
+                    document.getElementById('label').style.paddingLeft = '0'
+
+                    m_submit.addEventListener('click', ()=> {
+                        m_submit.style.padding = '7px'
+                        m_submit.style.padding = '7px'
+                    })
+                }else{
+                    document.getElementById('attendance').setAttribute('style', "padding:5px; width: 70%;");
+                    document.getElementById('frame').style.textAlign = 'center'
+                    document.getElementById('result').style.fontSize = '16px'
+
+                    m_submit.style.width = '130px'
+                    m_submit.style.padding = '10px'
+
+
+                }
+             </script>
+
+            <!-- {% endblock %} -->
+        </div>
+    </div>
+
+    <!-- <script src="{{ url_for('static', filename='js/base.js') }}"></script> -->
+     <script>
+        var width = window.screen.availWidth;
+        var height = window.screen.availHeight;
+        console.log("Available Screen Width:", width);
+        console.log("Available Screen Height:", height);
+        console.log('prime')
+        console.log(typeof width)
+
+
+        var sidebar = document.querySelector('.container > div:nth-child(1)');
+        var content = document.querySelector('.container > div:nth-child(2)');
+        var menu = document.getElementById('menu')
+        var icon = document.getElementById('menu-icon');
+        // the part that welcomes user
+        document.getElementById('result').innerText = 'welcome Prime';
+
+        // the part that gives menu action
+        icon.addEventListener('click', () => {
+            if (sidebar.style.display === 'none') {
+                sidebar.style.display = 'block';
+            } else {
+                sidebar.style.display = 'none';
+            }
+        })
+
+
+
+        if (width < 450) {
+            // sidebar.style.flexBasis  = '0%';
+            sidebar.style.display = 'none';
+            // content.style.flexBasis = '100%';
+            content.style.width = '100%';
+            content.style.padding = '3px';
+            menu.style.justifyContent = 'space-between'
+            console.log('width < 451')
+            content.style.flexBasis = '100%';
+        }else{
+            document.getElementById('menu-icon').style.display = 'none';
+            menu.style.justifyContent = 'flex-end'
+            menu.style.paddingRight = '7px'
+        }
+     </script>
+
+    
+</body>
+</html>
