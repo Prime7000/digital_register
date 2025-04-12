@@ -151,7 +151,7 @@ class WorkerForm(FlaskForm):
     address = StringField('Address', validators=[DataRequired()])
     dept = StringField('Department', validators=[DataRequired()])
     falculty = StringField('Falculty', validators=[DataRequired()])
-    level = SelectField('Gender',choices=[('100lv', '100lv'), ('200lv', '200lv'), ('300lv', '300lv'), ('400lv', '400lv'), ('500lv', '500lv')],validators=[DataRequired()])
+    level = SelectField('Level',choices=[('100lv', '100lv'), ('200lv', '200lv'), ('300lv', '300lv'), ('400lv', '400lv'), ('500lv', '500lv')],validators=[DataRequired()])
     next_of_kin = StringField('Next of kin', validators=[DataRequired()])
     group = SelectField('Group',coerce=int, validators=[DataRequired()])
     position = SelectField('Position',coerce=int, validators=[DataRequired()])
