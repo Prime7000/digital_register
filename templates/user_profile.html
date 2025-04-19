@@ -3,105 +3,149 @@
 {% block title %} {{ current_user.first_name }} {{ current_user.last_name }} - Profile {% endblock %}
 
 {% block content %}
-<div class="container mt-4 mb-5">
+<style>
+    body{
+        background-color: #f4f4f4;
+    }
+    .info1{
+        grid-area: info1;
+    }
+    .info2{
+        grid-area: info2;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+    }
+    .info3{
+        grid-area: info3;
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+    }
 
-    <!-- Back Button -->
-    <a href="/workers_records" class="btn btn-secondary mb-3">
-        <i class="fas fa-arrow-left me-1"></i> Back to Workers List
-    </a>
-    {# Assuming 'workers_records' is the endpoint name for the '/workers_records' URL #}
-    {# If you don't use url_for, you can use: href="/workers_records" #}
-    {# You might need Font Awesome for the icon, adjust if not using #}
+    .desktop_container{
+        display: grid;
+        grid-template-columns: repeat(4,1fr);
+        grid-template-rows: 25vh 25vh 25vh 25vh;
+        grid-template-areas: 
+        "info1 info1 info3 info3"
+        "info1 info1 info3 info3"
+        "info2 info2 info3 info3"
+        "info2 info2 info3 info3"
+        ;
+        gap: 1rem;
 
+    }
 
-    <div class="card shadow-sm">
-        <div class="card-header bg-primary text-white">
-            <h2 class="h4 mb-0">Worker Profile: {{ current_user.first_name }} {{ current_user.last_name }}</h2>
+    .child{
+        /* border: 1px solid black; */
+        border-radius: 20px;
+        background-color: white;
+        box-shadow: 5px 5px 10px rgba(0,0,0,0.3);
+    }
+    .desktop_container p{
+        line-height: 1.2rem;
+        margin: 6px;
+        font-size: 20px;
+    }
+    .d_img_body{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+    }
+
+    /* the phohe view */
+    @media screen and (max-width:500px){
+        .desktop_container{
+            display: none;
+        }
+
+        body{
+        /* background-color: green; */
+        }
+        p{
+            line-height: 1.2rem;
+            margin: 6px;
+        }
+        .m_body{
+            background-color: #f4f4f4;
+            height: auto;
+            width: 100%;
+            border-radius: 20px;
+            box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3);
+        }
+        .m_img_body{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;height: auto;
+        }
+    }
+</style>
+<body>
+    <div class="desktop_container">
+        <div class=" info1">
+            <section>
+                <div class="d_img_body">
+                    <img src="{{ url_for('uploaded_file', filename=current_user.passport_image) }}" width="200px" height="200px" alt="" style="border-radius: 50%; object-fit: cover;">
+                </div>
+                <p style="text-align: center; font-size: 30px;"><b>{{current_user.first_name}} {{current_user.last_name}}</b></p>
+                <p style="text-align: center; font-size:20px; color: rgb(94, 89, 89);"><b>{{current_user.unique_id}}</b></p>
+            </section>
         </div>
-        <div class="card-body">
-            <div class="row g-4">
+        <div class="child info2">
+            <p style="font-size: 30px; font-weight: 900; color:rgba(0,0,0,0.5) ;">Contacts</p>
+            <p><span><b>Phone1:</b></span>{{current_user.phone_number}}</p>
+            <p><span><b>Phone2:</b></span>{{current_user.phone_number_2}}</p>
+            <p><span><b>Whatsapp:</b></span>{{current_user.whatsapp_number}}</p>
+            <p><span><b>Email:</b></span>{{current_user.email}}</p>
+            <p><span><b>Address:</b></span>{{current_user.address}}</p>
 
-                <!-- Column 1: Image and Basic Info -->
-                <div class="col-md-4 text-center text-md-start">
-                    {% if current_user.passport_image %}
-                        <img src="{{ url_for('uploaded_file', filename=current_user.passport_image) }}"
-                             alt="Passport Photo for {{ current_user.first_name }}"
-                             class="img-fluid rounded-circle img-thumbnail mb-3"
-                             style="max-width: 200px; height: auto; border: 3px solid #dee2e6;">
-                        {# Adjust src generation if your image path is different, e.g. just {{ current_user.passport_image }} if it's a full URL #}
-                        {# Example assumes images are in static/images/ folder #}
-                    {% else %}
-                        <div class="text-center p-5 border rounded mb-3" style="max-width: 200px; margin: auto;">
-                            <i class="fas fa-user fa-5x text-muted"></i> {# Placeholder Icon #}
-                            <p class="text-muted mt-2">No Image</p>
-                        </div>
-                    {% endif %}
 
-                    <h4 class="mb-3">{{ current_user.first_name }} {{ current_user.last_name }}</h4>
-                    <p><strong>Unique ID:</strong> {{ current_user.unique_id }}</p>
-                    <p><strong>Gender:</strong> {{ current_user.gender }}</p>
-                    <p><strong>Date of Birth:</strong> {{ current_user.date_of_birth }}</p>
-                     <p><strong>Next of Kin:</strong> {{ current_user.next_of_kin }}</p>
-                </div>
+            <p></p>
+        </div>
+        <div class="child info3">
+            <p style="font-size: 30px; font-weight: 900; color:rgba(0,0,0,0.5) ;">Details</p>
+            <p><span><b>Dept:</b></span>{{current_user.dept}}</p>
+            <p><span><b>Falculty:</b></span>{{current_user.falculty}}</p>
+            <p><span><b>Level:</b></span>{{current_user.level}}</p>
+            <p><span><b>Next of kin contact:</b></span>{{current_user.next_of_kin}}</p>
+            <p><span><b>Group:</b></span>{{current_user.group.group_name}}</p>
+            <p><span><b>Group position:</b></span>{{current_user.position.position_name}}</p>
+            <p><span><b>Gender:</b></span>{{current_user.gender}}</p>
+            <p><span><b>Date of birth:</b></span>{{current_user.date_of_birth}}</p>
 
-                <!-- Column 2: Detailed Information -->
-                <div class="col-md-8">
-                    <h5 class="border-bottom pb-2 mb-3">Contact Information</h5>
-                    <dl class="row">
-                        <dt class="col-sm-4">Email:</dt>
-                        <dd class="col-sm-8"><a href="mailto:{{ current_user.email }}">{{ current_user.email }}</a></dd>
 
-                        <dt class="col-sm-4">Primary Phone:</dt>
-                        <dd class="col-sm-8">{{ current_user.phone_number }}</dd>
 
-                        {% if current_user.phone_number_2 %}
-                        <dt class="col-sm-4">Secondary Phone:</dt>
-                        <dd class="col-sm-8">{{ current_user.phone_number_2 }}</dd>
-                        {% endif %}
 
-                        <dt class="col-sm-4">WhatsApp Number:</dt>
-                        <dd class="col-sm-8">{{ current_user.whatsapp_number }}</dd>
+        </div>
+    </div>
 
-                        {% if current_user.address %}
-                        <dt class="col-sm-4">Address:</dt>
-                        <dd class="col-sm-8">{{ current_user.address }}</dd>
-                        {% endif %}
-                    </dl>
-
-                    <h5 class="border-bottom pb-2 mt-4 mb-3">Academic / Work Information</h5>
-                     <dl class="row">
-                        <dt class="col-sm-4">Department:</dt>
-                        <dd class="col-sm-8">{{ current_user.dept }}</dd>
-
-                        <dt class="col-sm-4">Faculty:</dt>
-                        <dd class="col-sm-8">{{ current_user.falculty }}</dd> {# Corrected typo if changed in model #}
-
-                        <dt class="col-sm-4">Level:</dt>
-                        <dd class="col-sm-8">{{ current_user.level }}</dd>
-
-                        <dt class="col-sm-4">Group:</dt>
-                        <dd class="col-sm-8">
-                            {% if current_user.group %}
-                                {{ current_user.group.name | default('N/A') }} {# Assumes Group model has a 'name' attribute #}
-                            {% else %}
-                                Not Assigned
-                            {% endif %}
-                        </dd>
-
-                        <dt class="col-sm-4">Position:</dt>
-                        <dd class="col-sm-8">
-                            {% if current_user.position %}
-                                {{ current_user.position.title | default('N/A') }} {# Assumes Position model has a 'title' attribute #}
-                            {% else %}
-                                Not Assigned
-                            {% endif %}
-                        </dd>
-                    </dl>
-                </div>
-
-            </div> <!-- /row -->
-        </div> <!-- /card-body -->
-    </div> <!-- /card -->
-
-</div> <!-- /container -->
+    <!-- phone view section -->
+    <main>
+        <div class="m_img_body">
+                <img src="{{ url_for('uploaded_file', filename=current_user.passport_image) }}" width="150px" height="150px" alt="" style="border-radius: 50%; object-fit: cover;">
+        </div>
+        <p style="text-align: center; font-size: 25px;"><b>{{current_user.first_name}} {{current_user.last_name}}</b></p>
+        <p style="text-align: center; font-size:18px; color: rgb(94, 89, 89);"><b>{{current_user.unique_id}}</b></p>
+        
+        <div class="m_body" style="padding-top: 3px;">
+            <p><span><b>Phone1:</b></span>{{current_user.phone_number}}</p>
+            <p><span><b>Phone2:</b></span>{{current_user.phone_number_2}}</p>
+            <p><span><b>Whatsapp:</b></span>{{current_user.whatsapp_number}}</p>
+            <p><span><b>Email:</b></span>{{current_user.email}}</p>
+            <p><span><b>Address:</b></span>{{current_user.address}}</p>
+            <p><span><b>Dept:</b></span>{{current_user.dept}}</p>
+            <p><span><b>Falculty:</b></span>{{current_user.falculty}}</p>
+            <p><span><b>Level:</b></span>{{current_user.level}}</p>
+            <p><span><b>Next of kin contact:</b></span>{{current_user.next_of_kin}}</p>
+            <p><span><b>Group:</b></span>{{current_user.group.group_name}}</p>
+            <p><span><b>Group position:</b></span>{{current_user.position.position_name}}</p>
+            <p><span><b>Gender:</b></span>{{current_user.gender}}</p>
+            <p><span><b>Date of birth:</b></span>{{current_user.date_of_birth}}</p>
+        </div>
+    </main>
 {% endblock %}
