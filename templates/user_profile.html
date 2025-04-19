@@ -4,6 +4,10 @@
 
 {% block content %}
 <style>
+    #mobile_view{
+        display: none;
+    }
+
     body{
         background-color: #f4f4f4;
     }
@@ -58,9 +62,12 @@
     }
 
     /* the phohe view */
-    @media screen and (max-width:500px){
+    @media screen and (max-width:750px){
         .desktop_container{
             display: none;
+        }
+        #mobile_view{
+            display: block;
         }
 
         body{
@@ -125,7 +132,7 @@
     </div>
 
     <!-- phone view section -->
-    <main>
+    <main id="mobile_view">
         <div class="m_img_body">
                 <img src="{{ url_for('uploaded_file', filename=current_user.passport_image) }}" width="150px" height="150px" alt="" style="border-radius: 50%; object-fit: cover;">
         </div>
