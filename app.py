@@ -53,6 +53,12 @@ class User(UserMixin, db.Model):
 
     def __str__(self):
         return f'<User {self.username}>'
+
+# load user for flask-login
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
     
 class Group(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -170,15 +176,58 @@ def load_user(user_id):
 # ________________________________________________________________________________________________________
 @app.route('/')
 def index():
+    if not current_user.is_authenticated:
+        return redirect(url_for('login'))
     return render_template('index.html')
 
-@app.route('/signup')
+@app.route('/signup', methods=['POST','GET'])
 def signup():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        first_name = request.form.get('first_name')
+        last_name = request.form.get('last_name')
+        email = request.form.get('email')
+        role = request.form.get('role')
+        password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
+
+        print(f'{username}---{first_name}')
+
+        if password != confirm_password:
+            return render_template('signup.html', error = 'password does not match, try again')
+        
+        if User.query.filter_by(username=username).first():
+            return render_template('signup.html', error = 'Username already taken')
+        
+        encrypted_pass = generate_password_hash(password, method='pbkdf2:sha256')
+        new_user = User(username = username,first_name=first_name,last_name=last_name,email=email,role=role,password_hash=encrypted_pass)
+        db.session.add(new_user)
+        db.session.commit()
+
+        return redirect(url_for("login"))
+        
     return render_template('signup.html')
 
-@app.route('/login')
+@app.route('/login', methods = ['POST','GET'])
 def login():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+
+        user = User.query.filter_by(username = username).first()
+
+        if user and check_password_hash(user.password_hash, password):
+            login_user(user)
+            return redirect(url_for('index'))
+        else:
+            return render_template('login.html', error='Invalid username or passsword')
+        
     return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
 
 @app.route('/add_workers',methods=['GET', 'POST'])
 def add_workers():

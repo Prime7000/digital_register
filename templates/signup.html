@@ -45,8 +45,12 @@
 
 </style>
 <main>
+    <form action="" method="post" style="width: 100%; display: flex;justify-content: center;align-items: center;">
     <div id="signup-prop">
         <h1 style="text-align: center;">Signup</h1>
+        {% if error %}
+            <h5 style="text-align: center; color: red;">{{error}}</h5>
+        {% endif %}
         <label for="username">Username</label>
         <input type="text" name="username" id="" placeholder="Insert Username e.g Prime">
 
@@ -57,10 +61,10 @@
         <input type="text" name="last_name" id="" placeholder="Insert last name e.g Agbaduta">
 
         <label for="email">Email</label>
-        <input type="email" name="Email" id="" placeholder="Insert Email e.g primeofejiro@gmail.com">
+        <input type="email" name="email" id="" placeholder="Insert Email e.g primeofejiro@gmail.com">
 
-        <label for="username">Role</label>
-        <select name="" id="" style="height: 2rem; border-radius: 7px; border: none;">
+        <label for="role">Role</label>
+        <select name="role" id="" style="height: 2rem; border-radius: 7px; border: none;">
             <option value="leader">Leader</option>
             <option value="admin">Admin</option>
             <option value="inspector">inspector</option>
@@ -95,6 +99,7 @@
             <button type="submit">Submit</button>
         </div>
     </div>
+</form>
     
 </main>
 

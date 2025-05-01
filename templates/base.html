@@ -85,11 +85,14 @@
             <p>
                 <a href="/signup">Signup</a>
             </p>
+            {% if not current_user.is_authenticated %}
             <p>
                 <a href="/login">Login</a>
             </p>
+            {% else %}
             <p>Settings</p>
-            <p>Logout</p>
+            <p><a href="/logout">Logout</a></p>
+            {% endif %}
         </div>
 
 

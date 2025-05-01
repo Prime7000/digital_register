@@ -43,36 +43,41 @@
 
 </style>
 <main>
+    <form  style="display: flex; justify-content: center; align-items: center; width: 100%;" method="POST">
     <div id="signup-prop">
-        <h1 style="text-align: center;">Login</h1>
-        <label for="username">Username</label>
-        <input type="text" name="username" id="" placeholder="Insert Username e.g Prime">
+            <h1 style="text-align: center;">Login</h1>
+            {% if error %}
+                <h5 style="text-align: center; color: red;">{{error}}</h5>
+            {% endif %}
+            <label for="username">Username</label>
+            <input type="text" name="username" id="" placeholder="Insert Username e.g Prime">
 
-        <label for="password">Password</label>
-        <input type="password" name="password" id="" placeholder="Insert your password">
+            <label for="password">Password</label>
+            <input type="password" name="password" id="" placeholder="Insert your password">
 
-        <label for=""></label>
-        <div style="text-align: center;">
-            <style>
-                button{
-                    width: 100px;
-                    text-align: center;
-                    padding: 5px;
-                    border-radius:20px;
-                }
+            <label for=""></label>
+            <div style="text-align: center;">
+                <style>
+                    button{
+                        width: 100px;
+                        text-align: center;
+                        padding: 5px;
+                        border-radius:20px;
+                    }
 
-                button:hover{
-                    width: 100px;
-                    text-align: center;
-                    padding: 5px;
-                    border-radius:20px;
-                    background-color: white;
-                    padding: 8px;
-                    transition: all 0.7s;
-                }
-            </style>
-            <button type="submit">Submit</button>
-    </div>
+                    button:hover{
+                        width: 100px;
+                        text-align: center;
+                        padding: 5px;
+                        border-radius:20px;
+                        background-color: white;
+                        padding: 8px;
+                        transition: all 0.7s;
+                    }
+                </style>
+                <button type="submit">Submit</button>
+            </div>
+        </form>
 </main>
 
 <script src="{{ url_for('static', filename='js/login.js') }}"></script>
