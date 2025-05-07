@@ -310,6 +310,31 @@ def add_position():
     positions = Position.query.all()
     return render_template('add_position.html',form=form, position = positions)
 
+@app.route('/edit_position/<int:pos_id>',methods=['GET','POST'])
+def edit_position(pos_id):
+    form = PositionForm()
+    pos = Position.query.get(pos_id)
+    if form.validate_on_submit():
+        pos.position_name = form.position_name.data
+        db.session.commit()
+        return redirect(url_for('add_position'))
+    
+    return render_template('edit_pages/edit_position.html',form=form, position = pos)
+
+
+@app.route('/delete_position/<int:pos_id>')
+def delete_position(pos_id):
+    pos = Position.query.get(pos_id)
+    if pos:
+        db.session.delete(pos)
+        db.session.commit()
+        return redirect(url_for('add_position'))
+    else:
+        msg = 'no such position'
+        return render_template('add_position.html',error = msg)
+
+    
+
 @app.route('/workers_records')
 def workers_record():
     workers = Workers.query.all()
@@ -594,7 +619,10 @@ def events_register():
 
 # ... (keep other routes and the rest of the app.py code)
     
+@app.route('/settings', methods=['POST','GET'])
+def settings():
 
+    return render_template('setting.html')
 
 
 # ________________________________________________________________________________________________________

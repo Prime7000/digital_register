@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Add Workers/Groups{% endblock %} {# Updated title slightly for clarity #}
+{% block title %}edit position{% endblock %} {# Updated title slightly for clarity #}
 
 {% block content %}
 
@@ -120,11 +120,11 @@
             {{ form.hidden_tag() }} {# CSRF token #}
 
             {{ form.position_name.label }} {# Render label #}
-            {{ form.position_name(placeholder="Enter new position name", size=20 ,style="width: 100%;") }} {# Render input field with placeholder #}
+            {{ form.position_name(placeholder=position.position_name, size=20 ,style="width: 100%;") }} {# Render input field with placeholder #}
             {# Display errors for the field if any #}
             {% if form.position_name.errors %}
                 <ul class="errors" style="color: red; list-style: none; padding-left: 0; font-size: 0.9em;">
-                    {% for error in form.position_name.errors %}<li>{{ error }}</li>{% endfor %}
+                    <li>{{ error }} </li>
                 </ul>
             {% endif %}
 
@@ -137,40 +137,6 @@
     </div> {# Close signup-prop #}
 </main>
 
-{# Separator and List of existing groups - placed outside the main styled box #}
-<hr style="width: 60%; margin: 2rem auto;">
-
-<style>
-    #engine{
-        display: flex;
-        flex-direction: row;
-    }
-</style>
-
-<div class="group-list">
-    <h2>Existing Positions</h2>
-    {% if position %}
-    <ul>
-        {% for p in position %}
-        <li id="engine">
-            <p style="flex-basis: 50%; flex-grow: 0; flex-shrink: 0;">{{ p.position_name }}</p>
-            <p style="flex-basis: 50%; flex-grow: 0; flex-shrink: 0; text-align: end;">
-                <a href="/edit_position/{{ p.id }}">
-                    <span style="padding: 5px; background-color: rgb(25, 125, 191); color: white; border-radius: 20px;">Edit</span>
-                </a>
-                <a href="/delete_position/{{ p.id }}">
-                    <span style="padding: 5px; background-color: rgb(191, 25, 25); color: white; border-radius: 20px;">Delete</span>
-                </a>
-            </p>
-        </li>
-        {% endfor %}
-    </ul>
-    {% else %}
-        <p style="text-align: center; color: #888;">No positions added yet.</p>
-    {% endif %}
-</div>
-
-{# Include the JavaScript file if needed #}
 <script src="{{ url_for('static', filename='js/login.js') }}"></script>
 
 {% endblock %}

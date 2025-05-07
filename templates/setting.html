@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}Settings{% endblock %}
+
+{% block content %}
+
+<style>
+    main{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+    }
+    #signup-prop{
+        /* border: 1px solid black; */
+        width:50%;
+        height:auto;
+        border-radius: 20px;
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        background-color: #f4f4f4;
+    }
+
+    #signup-prop input{
+        height: 2rem;
+        border-radius: 7px;
+        border: none;
+    }
+
+    #signup-prop input:hover{
+        height: 2rem;
+        border-radius: 7px;
+        border: 3px solid black;
+    }
+
+    #signup-prop label{
+        padding-top: 0.7rem;
+        font-weight: 900;
+    }
+
+
+</style>
+<main>
+    <form  style="display: flex; justify-content: center; align-items: center; width: 100%;" method="POST">
+    <div id="signup-prop">
+            <h1 style="text-align: center;">Settings</h1>
+            {% if error %}
+                <h5 style="text-align: center; color: red;">{{error}}</h5>
+            {% endif %}
+            <label for="username">Prefix</label>
+            <input type="text" name="prefix" id="" placeholder="Insert Organisational prefix e.g LunafireX ">
+
+
+            <label for=""></label>
+            <div style="text-align: center;">
+                <style>
+                    button{
+                        width: 100px;
+                        text-align: center;
+                        padding: 5px;
+                        border-radius:20px;
+                    }
+
+                    button:hover{
+                        width: 100px;
+                        text-align: center;
+                        padding: 5px;
+                        border-radius:20px;
+                        background-color: white;
+                        padding: 8px;
+                        transition: all 0.7s;
+                    }
+                </style>
+                <button type="submit">Submit</button>
+            </div>
+        </form>
+</main>
+
+<script src="{{ url_for('static', filename='js/login.js') }}"></script>
+{% endblock %}
