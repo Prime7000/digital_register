@@ -129,7 +129,7 @@
             {{ form.hidden_tag() }} {# CSRF token #}
 
             {{ form.event_name.label }} {# Render label #}
-            {{ form.event_name(placeholder="Enter new event name", size=20 ,style="width: 100%;") }} {# Render input field with placeholder #}
+            {{ form.event_name(placeholder="Enter new event name", size=20 ,style="width: 100%;" ) }} {# Render input field with placeholder #}
                 
             {{form.event_day.label}}
             {{form.event_day()}}
@@ -149,36 +149,6 @@
 </main>
 
 {# Separator and List of existing groups - placed outside the main styled box #}
-<hr style="width: 60%; margin: 2rem auto;">
-
-<style>
-    #engine{
-        display: flex;
-        flex-direction: row;
-    }
-</style>
-
-<div class="group-list">
-    <h2>Existing Events</h2>
-    {% if events %}
-    <ul>
-        {% for p in events %}
-        <li id="engine">
-            <p style="flex-basis: 50%; flex-grow: 0; flex-shrink: 0;">{{ p.event_name }}</p>
-            <p style="flex-basis: 50%; flex-grow: 0; flex-shrink: 0; text-align: end;">
-                <a href="/edit_event/{{ p.id }}">
-                    <span style="padding: 5px; background-color: rgb(25, 125, 191); color: white; border-radius: 20px;">Edit</span>
-                </a>
-                <a href="/delete_event/{{ p.id }}">
-                    <span style="padding: 5px; background-color: rgb(191, 25, 25); color: white; border-radius: 20px;">Delete</span>
-                </a>
-            </p>
-        </li>        {% endfor %}
-    </ul>
-    {% else %}
-        <p style="text-align: center; color: #888;">No Event added yet.</p>
-    {% endif %}
-</div>
 
 {# Include the JavaScript file if needed #}
 <script src="{{ url_for('static', filename='js/login.js') }}"></script>

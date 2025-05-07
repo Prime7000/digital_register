@@ -71,8 +71,8 @@ class Events(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     event_name = db.Column(db.String(50), nullable=False)
     event_day = db.Column(db.String(50), nullable=True)
-    event_start_time = db.Column(db.String(50), nullable=False)
-    event_late_time = db.Column(db.String(50), nullable=False)
+    event_start_time = db.Column(db.Time(), nullable=False)
+    event_late_time = db.Column(db.Time(), nullable=False)
     # worker = db.relationship('Workers', backref='events', lazy=True, nullable=True)
     # worker_id = db.Column(db.Integer, db.ForeignKey('workers.id'), nullable=True)
 
@@ -367,7 +367,7 @@ def add_event():
         event_day = form.event_day.data
         event_start_time = form.event_start_time.data
         event_late_time = form.event_late_time.data
-        new_event = Events(event_name=event_name, event_day=event_day, event_start_time=str(event_start_time), event_late_time=str(event_late_time))
+        new_event = Events(event_name=event_name, event_day=event_day, event_start_time=event_start_time, event_late_time=event_late_time)
         db.session.add(new_event)
         db.session.commit()
         return redirect(url_for('add_event'))
@@ -379,6 +379,32 @@ def add_event():
         
     events = Events.query.all()
     return render_template('add_event.html', form=form, events=events)
+
+@app.route('/edit_event/<int:pos_id>',methods=['GET','POST'])
+def edit_event(pos_id):
+    pos = Events.query.get(pos_id)
+    form= EventForm(obj=pos)
+    if form.validate_on_submit():
+        pos.event_name = form.event_name.data
+        pos.event_day = form.event_day.data
+        pos.event_start_time = form.event_start_time.data
+        pos.event_late_time = form.event_late_time.data
+        db.session.commit()
+        return redirect(url_for('add_event'))
+    
+    return render_template('edit_pages/edit_events.html',form=form, position = pos)
+
+
+@app.route('/delete_event/<int:pos_id>')
+def delete_event(pos_id):
+    pos = Events.query.get(pos_id)
+    if pos:
+        db.session.delete(pos)
+        db.session.commit()
+        return redirect(url_for('add_event'))
+    else:
+        msg = 'no such event'
+        return render_template('add_event.html',error = msg)
     
 from datetime import datetime
 
