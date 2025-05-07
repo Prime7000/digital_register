@@ -91,7 +91,15 @@ class Event_register(db.Model):
     month = db.Column(db.String(50), nullable=False)
     year = db.Column(db.String(50), nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.datetime.now)
-    
+
+# site settings model
+class Site_settings(db.Model):
+    id =  db.Column(db.Integer, primary_key=True)
+    prefix = db.Column(db.String(17), default='lunafireX')
+
+
+
+
 # event form
 class EventForm(FlaskForm):
     event_name = StringField('Event Name', validators=[DataRequired()])
@@ -242,7 +250,8 @@ def add_workers():
         year = date_obj.year
 
         random_number = random.randint(100000, 999999)
-        unique_id = f"vor/{year}/{random_number}"
+        prefix = Site_settings.query.first()
+        unique_id = f"{prefix.prefix}/{year}/{random_number}"
         
 
         # print('image detected', f'filename {form.passport_image.data}')
@@ -621,8 +630,18 @@ def events_register():
     
 @app.route('/settings', methods=['POST','GET'])
 def settings():
+        data = request.form
+        settings = Site_settings.query.first()
 
-    return render_template('setting.html')
+        if not settings:
+            settings = Site_settings()
+            db.session.add(settings)
+
+        # update field
+        settings.prefix = data.get('prefix',settings.prefix)
+        db.session.commit()
+
+        return render_template('setting.html', settings = settings)
 
 
 # ________________________________________________________________________________________________________
