@@ -305,6 +305,28 @@ def add_group():
     groups = Group.query.all()
     return render_template('add_group.html', form=form, group=groups)
 
+@app.route('/edit_group/<int:pos_id>',methods=['GET','POST'])
+def edit_group(pos_id):
+    pos = Group.query.get(pos_id)
+    form = GroupForm(obj = pos)
+    if form.validate_on_submit():
+        pos.group_name = form.group_name.data
+        db.session.commit()
+        return redirect(url_for('add_group'))
+    
+    return render_template('edit_pages/edit_group.html',form=form, position = pos)
+
+@app.route('/delete_group/<int:pos_id>')
+def group_position(pos_id):
+    pos = Group.query.get(pos_id)
+    if pos:
+        db.session.delete(pos)
+        db.session.commit()
+        return redirect(url_for('add_group'))
+    else:
+        msg = 'no such group'
+        return render_template('add_group.html',error = msg)
+
 @app.route('/add_position',methods=['GET','POST'])
 def add_position():
     form = PositionForm()
