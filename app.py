@@ -68,11 +68,13 @@ class Group(db.Model):
         return f'<Group {self.group_name}>'
     
 class Events(db.Model):
+    __tablename__ = 'events'
     id = db.Column(db.Integer, primary_key=True)
     event_name = db.Column(db.String(50), nullable=False)
     event_day = db.Column(db.String(50), nullable=True)
     event_start_time = db.Column(db.Time(), nullable=False)
     event_late_time = db.Column(db.Time(), nullable=False)
+    registrations = db.relationship('Event_register', backref='events',cascade='all, delete-orphan')
     # worker = db.relationship('Workers', backref='events', lazy=True, nullable=True)
     # worker_id = db.Column(db.Integer, db.ForeignKey('workers.id'), nullable=True)
 
@@ -81,9 +83,10 @@ class Events(db.Model):
         return f'<Group {self.event_name}>'
     
 class Event_register(db.Model):
+    __tablename__ = 'event_register'
     id =  db.Column(db.Integer, primary_key=True)
     event = db.relationship('Events', backref='event_register', lazy=True)
-    event_id = db.Column(db.Integer, db.ForeignKey('events.id'), nullable=False)
+    event_id = db.Column(db.Integer, db.ForeignKey('events.id',ondelete='CASCADE'), nullable=False)
     worker = db.relationship('Workers', backref='event_register', lazy=True)
     worker_id = db.Column(db.Integer, db.ForeignKey('workers.id'), nullable=False)
     early = db.Column(db.Boolean, default=False)
@@ -487,68 +490,136 @@ def delete_event(pos_id):
         return render_template('add_event.html',error = msg)
     
 from datetime import datetime
+from sqlalchemy import or_
+from flask import request, render_template, flash, redirect, url_for
+
+
+# marking everyone as absent automatically
+def prefill_attendance_for_today():
+    now = datetime.now()
+    current_day = now.strftime("%A")
+    current_month = now.strftime("%B")
+    current_year = now.year
+
+    today_event = Events.query.filter_by(event_day=current_day).first()
+    if not today_event:
+        return  # No event today
+
+    workers = Workers.query.all()
+
+    for worker in workers:
+        # Avoid duplicate prefill
+        existing = Event_register.query.filter_by(
+            event_id=today_event.id,
+            worker_id=worker.id,
+            month=current_month,
+            year=current_year
+        ).first()
+
+        if not existing:
+            record = Event_register(
+                event_id=today_event.id,
+                worker_id=worker.id,
+                month=current_month,
+                year=current_year,
+                early=False,
+                present=False
+            )
+            db.session.add(record)
+
+    db.session.commit()
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    # Pull event-days for calendar
     events = Events.query.all()
-    events_days = [event.event_day for event in events]
-    print(f'---------------------------{events_days}')
+    events_days = [e.event_day for e in events]
 
+    # What day & month is it right now?
+    now = datetime.now()
+    current_day = now.strftime("%A")
+    current_month = now.strftime("%B")
 
-    current_day = datetime.now().strftime("%A")
-    current_month = datetime.now().strftime("%B")
-    print(f'---------------------------{current_day}')
-    print(f'---------------------------{current_month}')
+    # Find today’s event (if any)
+    today_event = Events.query.filter_by(event_day=current_day).first()
 
-    # current_day = 'Sunday'
-    event_day_id = Events.query.filter(Events.event_day == current_day).first()
-
-
+    # Prefill absences once per day
+    if today_event:
+        prefill_attendance_for_today()
 
     if request.method == 'POST':
         now = datetime.now()
-        current_time = now.strftime("%H:%M:%S")
-        current_time_obj = datetime.strptime(current_time, "%H:%M:%S")
-        
-        e = Events.query.filter(Events.event_day == current_day).first()
-        deadline_time = e.event_late_time
-        print(f'---------------------------{deadline_time}')
-        deadline_time_obj = datetime.strptime(deadline_time, "%H:%M:%S")
-        
+        current_time = now.time()
 
-        if current_time_obj < deadline_time_obj:
-            deadline_state = False
-            if_present = True
-        else:
-            deadline_state = True
-            if_present = False
-        
-        if current_day in events_days:
-            query = request.form['query']
-            if query:
-                results = Workers.query.filter(or_(Workers.first_name.contains(query),Workers.unique_id.contains(query))).first()
+        if not today_event:
+            return render_template(
+                'pages/attendant_register.html',
+                msg='No event for today'
+            )
 
-                mark = Event_register(
-                    event_id = event_day_id.id,
-                    worker_id = results.id,
-                    month = current_month,
-                    year = datetime.now().year,
-                    early = deadline_state,
-                    present = if_present
-                )
-                db.session.add(mark)
-                db.session.commit()
+        deadline_time = today_event.event_late_time
+        on_time = current_time <= deadline_time
+        late = not on_time
 
-                print(f'---------------------------sucessfully submitted')
-            else:
-                pass
+        early_flag = on_time
+        present_flag = True
 
+        query = request.form.get('query', '').strip()
+        if not query:
+            flash('Please enter a search term.', 'warning')
             return render_template('pages/attendant_register.html')
+
+        worker = Workers.query.filter(
+            or_(
+                Workers.first_name.contains(query),
+                Workers.unique_id.contains(query)
+            )
+        ).first()
+
+        if not worker:
+            flash('Worker not found.', 'error')
+            return render_template('pages/attendant_register.html')
+
+        # Check if the worker already has a record for today
+        existing = Event_register.query.filter_by(
+            event_id=today_event.id,
+            worker_id=worker.id,
+            month=current_month,
+            year=now.year
+        ).first()
+
+        if existing:
+            if existing.present:
+                flash('You have already registered today.', 'info')
+            else:
+                # Update presence
+                existing.present = present_flag
+                existing.early = early_flag
+                db.session.commit()
+                flash('Successfully updated your attendance.', 'success')
         else:
-            return render_template('pages/attendant_register.html',msg='No event for today')
-        
+            # Fallback: in case prefill didn't create it
+            new_mark = Event_register(
+                event_id=today_event.id,
+                worker_id=worker.id,
+                month=current_month,
+                year=now.year,
+                early=early_flag,
+                present=present_flag
+            )
+            db.session.add(new_mark)
+            db.session.commit()
+            flash('Successfully registered.', 'success')
+
+        return render_template('pages/attendant_register.html')
 
     return render_template('pages/attendant_register.html')
+
+
+    # GET → just render
+    return render_template('pages/attendant_register.html')
+
 
 
 
