@@ -292,6 +292,64 @@ def add_workers():
 
     return render_template('add_workers.html', form = form)
 
+@app.route('/edit_worker/<int:pos_id>', methods=['GET', 'POST'])
+def edit_worker(pos_id):
+    pos = Workers.query.get(pos_id)
+
+    # Convert date_of_birth to a datetime.date object if it's a string
+    if isinstance(pos.date_of_birth, str):
+        try:
+            pos.date_of_birth = datetime.strptime(pos.date_of_birth, "%Y-%m-%d").date()
+        except ValueError:
+            pos.date_of_birth = None
+
+    form = WorkerForm(obj=pos)
+
+    # ✅ Add choices to form dropdowns
+    form.group.choices = [(g.id, g.group_name) for g in Group.query.all()]
+    form.position.choices = [(p.id, p.position_name) for p in Position.query.all()]
+
+    if form.validate_on_submit():
+        pos.first_name = form.first_name.data
+        pos.last_name = form.last_name.data
+        pos.email = form.email.data
+        pos.phone_number = form.phone_number.data
+        pos.phone_number_2 = form.phone_number_2.data
+        pos.whatsapp_number = form.whatsapp_number.data
+        pos.address = form.address.data
+        pos.dept = form.dept.data
+        pos.falculty = form.falculty.data
+        pos.level = form.level.data
+        pos.next_of_kin = form.next_of_kin.data
+        pos.group_id = form.group.data
+        pos.position_id = form.position.data
+        pos.gender = form.gender.data
+        pos.date_of_birth = form.date_of_birth.data  # use as date object
+
+        if form.passport_image.data:
+            filename = secure_filename(form.passport_image.data.filename)
+            form.passport_image.data.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            pos.passport_image = filename
+
+        db.session.commit()
+
+        return redirect(url_for('user_profile', id=pos_id))
+
+    return render_template('edit_pages/edit_worker.html', form=form, current_user=pos)
+
+
+
+@app.route('/delete_worker/<int:pos_id>')
+def delete_worker(pos_id):
+    pos = Workers.query.get(pos_id)
+    if pos:
+        db.session.delete(pos)
+        db.session.commit()
+        return redirect(url_for('workers_record'))
+    else:
+        msg = 'no such person'
+        return render_template('workers_record.html',error = msg)
+
 @app.route('/add_group', methods=['GET', 'POST'])
 def add_group():
     form = GroupForm()

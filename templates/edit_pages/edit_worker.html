@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign Up{% endblock %}
+
+{% block content %}
+
+<style>
+    main{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+        padding-top: 250px
+    }
+    #signup-prop{
+        /* border: 1px solid black; */
+        width:50%;
+        height:auto;
+        border-radius: 20px;
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        background-color: #f4f4f4;
+    }
+
+    #signup-prop input{
+        height: 2rem;
+        border-radius: 7px;
+        border: none;
+        display: block;
+        width: 100%;
+        padding: 7px;
+    }
+
+    #signup-prop input:hover{
+        height: 2rem;
+        border-radius: 7px;
+        border: 3px solid black;
+    }
+
+    #signup-prop label{
+        padding-top: 0.7rem;
+        font-weight: 900;
+    }
+
+
+</style>
+<main>
+
+    <div id="signup-prop">
+        <h1 style="text-align: center;">New Worker Form</h1>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul>
+            {% for category, message in messages %}
+                <li class="{{ category }}">{{ message }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+        {% endwith %}
+        <form action="" method="post" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+
+        {{form.first_name.label}}
+        {{form.first_name()}}
+
+        {{form.last_name.label}}
+        {{form.last_name()}}
+
+        {{form.email.label}}
+        {{form.email()}}
+
+        {{form.phone_number.label}}
+        {{form.phone_number()}}
+
+        {{form.phone_number_2.label}}
+        {{form.phone_number_2()}}
+
+        {{form.whatsapp_number.label}}
+        {{form.whatsapp_number()}}
+
+        {{form.address.label}}
+        {{form.address()}}
+
+        {{form.dept.label}}
+        {{form.dept()}}
+
+        {{form.falculty.label}}
+        {{form.falculty()}}
+
+        {{form.next_of_kin.label}}
+        {{form.next_of_kin()}}
+        <br>
+        {{form.level.label}}
+        {{form.level()}}
+        <br><br>
+        {{form.group.label}}
+        {{form.group()}}
+            <br><br>
+        {{form.position.label}}
+        {{form.position()}}
+            <br><br>
+        {{form.gender.label}}
+        {{form.gender()}}
+        <br><br>
+
+        {{form.date_of_birth.label}}
+        {{form.date_of_birth()}}
+        <br>
+        {% if current_user.passport_image %}
+                    <img src="{{ url_for('uploaded_file', filename=current_user.passport_image) }}" width="50px" height="50px" alt="" style="border-radius: 10px; object-fit: cover;">
+        {% endif %}
+        <br>
+        {{form.passport_image.label}}
+        {{form.passport_image()}}
+
+        <label for=""></label>
+        <div style="text-align: center;">
+            <style>
+                button{
+                    width: 100px;
+                    text-align: center;
+                    padding: 5px;
+                    border-radius:20px;
+                }
+
+                button:hover{
+                    width: 100px;
+                    text-align: center;
+                    padding: 5px;
+                    border-radius:20px;
+                    background-color: white;
+                    padding: 8px;
+                    transition: all 0.7s;
+                }
+            </style>
+            <br>
+            <button type="submit">Submit</button>
+            </form>
+    </div>
+</main>
+
+<script src="{{ url_for('static', filename='js/login.js') }}"></script>
+{% endblock %}

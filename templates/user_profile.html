@@ -101,6 +101,12 @@
                 </div>
                 <p style="text-align: center; font-size: 30px;"><b>{{current_user.first_name}} {{current_user.last_name}}</b></p>
                 <p style="text-align: center; font-size:20px; color: rgb(94, 89, 89);"><b>{{current_user.unique_id}}</b></p>
+                <p style="text-align: center;padding-top: 10px;">
+                    <a href="/delete_worker/{{current_user.id}}">
+                        <span style="background-color: red; color:white; border-radius:20px; padding:5px;">     <b>Delete User</b>
+                        </span>
+                    </a>
+                </p>
             </section>
         </div>
         <div class="child info2">
@@ -126,7 +132,13 @@
             <p><span><b>Date of birth:</b></span>{{current_user.date_of_birth}}</p>
 
 
-
+            <p style="text-align: center;padding-top: 10px;">
+                <a href="/edit_worker/{{current_user.id}}">
+                    <span style="background-color: blue; color:white; border-radius:20px; padding:5px;">     
+                        <b>Edit Profile</b>
+                    </span>
+                </a>
+            </p>
 
         </div>
     </div>
